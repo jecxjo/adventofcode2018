@@ -133,6 +133,15 @@ toFrequencyMap = foldl fn initMap
     fn m (start, stop) = foldl fn' m (init [start .. stop]) -- Skip waking minute
     fn' m minute = Map.adjust (+1) minute  m
 
+-- PART 2
+
+-- |toGuardMostSlept converts map of guard start/stop to the most slept minute per guard
+toGuardMostSlept m = do
+  let lst = Map.toList m
+  let convert = head . sortBy (\(_,freqA) (_,freqB) -> compare freqB freqA) . Map.toList
+  map (\(k, startStopLst) -> (k, convert $ toFrequencyMap startStopLst)) lst
+
+
 main :: IO ()
 main = do
   putStrLn "Day 4.1: Guard Duty"
@@ -168,4 +177,23 @@ main = do
   -- Minutes: fromList [(0,0),(1,1),(2,1),(3,1),(4,2),(5,3),(6,3),(7,3),(8,4),(9,5),(10,5),(11,5),(12,5),(13,5),(14,7),(15,7),(16,7),(17,9),(18,10),(19,10),(20,10),(21,10),(22,9),(23,9),(24,9),(25,9),(26,10),(27,10),(28,10),(29,11),(30,11),(31,12),(32,12),(33,12),(34,12),(35,12),(36,11),(37,11),(38,11),(39,11),(40,11),(41,13),(42,13),(43,14),(44,12),(45,11),(46,11),(47,11),(48,12),(49,11),(50,11),(51,9),(52,9),(53,7),(54,7),(55,6),(56,5),(57,3),(58,2),(59,0)]
   -- Most Slept: (43,14)
   -- Solution 1: 65489
+
+  putStrLn "Day 4.2: Guard Duty"
+  let guardList = toGuardMostSlept processed
+  putStrLn $ "Guards Most Slept Minutes: " ++ show guardList
+
+  let guardWhoSleptTheMostAtOneMinute = head $ sortBy (\(_, (_, freqA)) (_, (_, freqB)) -> compare freqB freqA) guardList
+
+  putStrLn $ "Most Slept Guard: " ++ show guardWhoSleptTheMostAtOneMinute
+
+  let solution2 = (fst guardWhoSleptTheMostAtOneMinute) * (fst $ snd guardWhoSleptTheMostAtOneMinute)
+
+  putStrLn $ "Solution 2: " ++ show solution2
+
+  -- Output:
+  -- --------------------------------------
+  -- Day 4.2: Guard Duty
+  -- Guards Most Slept Minutes: [(89,(21,6)),(107,(36,16)),(523,(18,10)),(1069,(34,12)),(1171,(19,8)),(1409,(36,10)),(1439,(44,8)),(1523,(43,14)),(1607,(31,15)),(1627,(35,8)),(1789,(19,6)),(2003,(54,9)),(2069,(54,6)),(2081,(36,6)),(2287,(48,8)),(2399,(31,7)),(2707,(33,14)),(2857,(52,9)),(3373,(19,4)),(3469,(28,10))]
+  -- Most Slept Guard: (107,(36,16))
+  -- Solution 2: 3852
 
